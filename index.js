@@ -17,6 +17,12 @@ const ObjectsToCsv = require('objects-to-csv');
 
 const url = 'https://sfbay.craigslist.org/d/software-qa-dba-etc/search/sof'; 
 
+async function createCsv (data) {
+    let csv = new ObjectsToCsv(data);
+    // saving to file 
+    await csv.toDisk("./webscraper.csv")
+}; 
+
 async function webScraper () {
     const browser = await puppeteer.launch({ headless: false }); 
     const page = await browser.newPage(); 
@@ -39,23 +45,12 @@ async function webScraper () {
         const hoodElement = $(element).find('.result-hood');
         const hood = $(hoodElement).text().trim().replace('(', '').replace(')', '');
 
-        return { title, url, datePosted, hood};
+        return { title, url, datePosted, hood };
     }).get();
-    console.log(results); 
+
+    await createCsv(results); 
 
     await browser.close();
 }
 
-
-// async function createCsv (data) {
-//     let csv = new ObjectsToCsv(data);
-//     // saving to file 
-//     await csv.toDisk("./webscraper.csv")
-// }; 
-
-// async function csvScraper () {
-//     await createCsv(webScraper)
-// }
-
-// csvScraper(); 
 webScraper(); 
